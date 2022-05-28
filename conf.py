@@ -35,6 +35,32 @@ SYSTEMS = [
 CHANNELS = [
     # TEST
     # ('/test/healthz/', {'comp_codename': 'generic.test.healthz'}),
+    (
+        '/cmsi/send_dingtalk/',
+        {
+            "comp_codename": "generic.cmsi.send_dingtalk",
+            "comp_conf_to_db": [
+                ("ding_app_key", ""),
+                ("ding_app_secret", ""),
+            ],
+        }
+    ),
+    (
+        '/cmsi/send_dingbot/',
+        {
+            "comp_codename": "generic.cmsi.send_dingbot",
+            "comp_conf_to_db": [
+                ("token_field", "qq"),
+                ("sign_field", "wx_userid")
+            ]
+        }
+    ),
+    (
+        '/cmsi/send_ding/',
+        {
+            "comp_codename": "generic.cmsi.send_ding",
+        }
+    )
 ]
 
 

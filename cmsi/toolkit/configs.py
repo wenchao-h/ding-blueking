@@ -54,6 +54,14 @@ qcloud_app_key = ""
 # 腾讯云短信签名
 qcloud_sms_sign = ""
 
+# 钉钉配置
+ding_app_key = ""
+ding_app_secret = ""
+
+# 钉钉群助手配置
+token_field = ""
+sign_field = ""
+
 # cmsi支持的信息发送类型
 msg_type = [
     {
@@ -84,6 +92,14 @@ msg_type = [
         "active_icon": get_base64_icon("icons_v2/voice_active.ico"),
         "unactive_icon": get_base64_icon("icons_v2/voice_unactive.ico"),
     },
+    {
+        "type": "ding",
+        "is_active": True,
+        "label": u"钉钉",
+        "label_en": "ding",
+        "active_icon": get_base64_icon("icons_v2/dingtalk_active.ico"),
+        "unactive_icon": get_base64_icon("icons_v2/dingtalk_unactive.ico"),
+    },
 ]
 
-msg_type_map = {"weixin": "send_weixin", "mail": "send_mail", "sms": "send_sms", "voice": "send_voice_msg"}
+msg_type_map = {"weixin": "send_weixin", "mail": "send_mail", "sms": "send_sms", "voice": "send_voice_msg", "ding": "send_ding"}
