@@ -6,7 +6,7 @@
 
 **注意：**仅在paas 2.12.25版本测试过，paas版本通过中控机执行`cat /data/src/open_paas/VERSION`可以查看
 
-1. 下载release包，上传到paas机器上的`/data`路径下，release包下载地址: 
+1. 下载release包，上传到paas机器上的`/data`路径下，release包下载地址: https://github.com/wenchao-h/ding-blueking/releases
 
 2. 备份paas机器上的`/data/bkce/open_paas/esb/components/generic/apis`，将release包解压到`/data/bkce/open_paas/esb/components/generic/apis`下
 
@@ -14,7 +14,7 @@
    # paas机器上执行
    mkdir -p /data/backup
    cp -r /data/bkce/open_paas/esb/components/generic/apis /data/backup
-   tar -xf /data/ding-blueking.tgz -C /data/bkce/open_paas/esb/components/generic/apis/
+   tar -xf /data/ding-blueking-x.x.x.tgz -C /data/bkce/open_paas/esb/components/generic/apis/
    ```
 
 3. 将钉钉接口注册到数据库
