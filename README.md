@@ -4,7 +4,7 @@
 
 ## 部署
 
-**注意：**仅在paas 2.12.25版本测试过，paas版本通过中控机执行`cat /data/src/open_paas/VERSION`可以查看
+**注意：** 仅在paas 2.12.25版本测试过，paas版本通过中控机执行`cat /data/src/open_paas/VERSION`可以查看
 
 1. 下载release包，上传到paas机器上的`/data`路径下，release包下载地址: https://github.com/wenchao-h/ding-blueking/releases
 
@@ -19,8 +19,10 @@
 
 3. 将钉钉接口注册到数据库
 
+
 ```
-# 设置环境变量
+# 在paas机器上执行:
+##  设置环境变量
 source /root/.bkrc
 source $CTRL_DIR/functions
 export BK_ENV=production
@@ -30,7 +32,7 @@ export PAAS_LOGGING_DIR=/data/bkce/logs/open_paas
 workon open_paas-esb
 python manage.py sync_system_and_channel_data
 
-# 重启esb
+## 重启esb
 systemctl restart bk-paas-esb.service
 ```
 
