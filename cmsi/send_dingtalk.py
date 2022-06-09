@@ -110,7 +110,7 @@ class SendDingtalk(Component, SetupConfMixin):
                             contact_way=SendDingtalk.contact_way,
                         )
                         receiver = [user["telephone"] for user in user_data["receiver"]]
-                        logger.info("SendDingtalk receiver: ", receiver)
+                        logger.info("SendDingtalk receiver: %s"%receiver)
                         if user_data.get("_extra_user_error_msg"):
                             return {
                                 "receiver_type": receiver_type,
@@ -131,7 +131,7 @@ class SendDingtalk(Component, SetupConfMixin):
 
 
     def handle(self):
-        logger.info("dingtalk.appkey_in_db: ", getattr(self, "ding_app_key"))
+        logger.info("dingtalk.appkey_in_db: %s"%getattr(self, "ding_app_key"))
         ding_app_key = (
             self.request.kwargs.get("ding_app_key")
             or getattr(self, "ding_app_key")
@@ -155,6 +155,7 @@ class SendDingtalk(Component, SetupConfMixin):
                 "content": data["content"],
             }
         )
+        logger.info("dingtalk.send_message data: %s"%data)
         result = self.invoke_other("generic.dingtalk.send_message", kwargs=data)
      
         if result["result"] and data.get("_extra_user_error_msg"):
@@ -162,5 +163,5 @@ class SendDingtalk(Component, SetupConfMixin):
                 "result": False,
                 "message": u"Some users failed to send wechat message. %s" % data["_extra_user_error_msg"],
             }
-        logger.info("send_dingtalk result: ", result)
+        logger.info("send_dingtalk result: %s"%result)
         self.response.payload = result

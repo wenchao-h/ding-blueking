@@ -20,21 +20,22 @@
 3. 将钉钉接口注册到数据库
 
 
-```
-# 在paas机器上执行:
-##  设置环境变量
-source /root/.bkrc
-source $CTRL_DIR/functions
-export BK_ENV=production
-export BK_FILE_PATH=/data/bkce/open_paas/cert/saas_priv.txt
-export PAAS_LOGGING_DIR=/data/bkce/logs/open_paas
+    ```
+    # 注册通道和接口文档，在paas机器上执行:
+    ##  设置环境变量
+    source /root/.bkrc
+    source $CTRL_DIR/functions
+    export BK_ENV=production
+    export BK_FILE_PATH=/data/bkce/open_paas/cert/saas_priv.txt
+    export PAAS_LOGGING_DIR=/data/bkce/logs/open_paas
 
-workon open_paas-esb
-python manage.py sync_system_and_channel_data
+    workon open_paas-esb
+    python manage.py sync_system_and_channel_data
+    python manage.py sync_api_docs
 
-## 重启esb
-systemctl restart bk-paas-esb.service
-```
+    ## 重启esb
+    systemctl restart bk-paas-esb.service
+    ```
 
 ## 消息单发
 

@@ -16,6 +16,7 @@ from components.component import Component, SetupConfMixin
 from common.forms import BaseComponentForm, ListField
 from common.constants import API_TYPE_OP
 from .toolkit import configs, tools
+from common.log import logger
 
 
 class SendDingbot(Component, SetupConfMixin):
@@ -97,6 +98,7 @@ class SendDingbot(Component, SetupConfMixin):
             "content": self.form_data["content"],
             "msg_key": self.form_data["msg_key"],
         }
+        logger.info("send_dingbot data: %s"%data)
         result = self.invoke_other("generic.dingbot.send_message", kwargs=data)
 
         if result["result"] and data.get("_extra_user_error_msg"):

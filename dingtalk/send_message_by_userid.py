@@ -31,7 +31,7 @@ class SendMessageByUserid(Component, SetupConfMixin):
 
     def get_dingtalk_access_token(self, params):
         result = self.invoke_other("generic.dingtalk.get_token", kwargs=params)
-        logger.info("SendMessageByUserid dingtalk_token: ", result)
+        logger.info("SendMessageByUserid dingtalk_token: %s"%result)
         return  result["data"]["access_token"] if result["result"] else None
 
     def handle(self):
@@ -55,8 +55,9 @@ class SendMessageByUserid(Component, SetupConfMixin):
                 "Content-Type": "application/json"
             }
             host = "https://api.dingtalk.com",
+            logger.info("SendMessageByUserid data: %s"%data)
             result = client.post(path=path, data=json.dumps(data), headers=headers, host=host)
-            logger.info("SendMessageByUserid: ", result)
+            logger.info("SendMessageByUserid: %s"%result)
             if result["result"]:
                 err_msg = ""
                 if ("invalidStaffIdList" in result["data"]) and result["data"]["invalidStaffIdList"]:

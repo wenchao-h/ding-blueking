@@ -212,7 +212,7 @@ def get_token_sign_with_username(username_list=None, token_field="extras__ddNumb
             "fields": ",".join(["username", token_field_list[0], sign_field_list[0]])
         }
     )
-    logger.info("ListUsers invoke: ", result)
+    logger.info("ListUsers invoke: %s"%result)
     if not result["result"]:
         raise CommonAPIError(u"Failed to get users contact information based on username, %s" % result["message"])
     user_data = {user["username"]: user for user in result["data"]}
@@ -265,7 +265,7 @@ def get_token_sign_with_username(username_list=None, token_field="extras__ddNumb
     if username_list and not result.get("bots_info"):
         raise CommonAPIError(u"All dingbots message failed to be sent. %s" % result["_extra_user_error_msg"])
 
-    logger.info("result: ", result)
+    logger.info("result: %s"%result)
     return result
 
 def group_by_user_type(receiver__username=[], token_field="extras__ddNumber", sign_field="wx_userid"):

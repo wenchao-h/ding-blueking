@@ -31,7 +31,7 @@ class GetUserid(Component, SetupConfMixin):
 
     def get_dingtalk_access_token(self, params):
         result = self.invoke_other("generic.dingtalk.get_token", kwargs=params)
-        logger.info("GetUserid dingtalk_token: ", result)
+        logger.info("GetUserid dingtalk_token: %s"%result)
         return  result["data"]["access_token"] if result["result"] else None
 
     def handle(self):
@@ -48,14 +48,14 @@ class GetUserid(Component, SetupConfMixin):
             invalid_mobile_msg = []
             valid_userid = []
             for m in self.form_data["mobile"]:
-                logger.info("DING mobile number:", m)
+                logger.info("DING mobile number: %s"%m)
                 mobile_result = client.post(
                     path=path, 
                     data=json.dumps({
                         "mobile": m
                     })
                 )
-                logger.info("GetUserid mobile_result:", mobile_result)
+                logger.info("GetUserid mobile_result: %s"%mobile_result)
                 if mobile_result["result"]:
                     userid = mobile_result["data"]["result"]["userid"]
                     valid_userid.append(userid)

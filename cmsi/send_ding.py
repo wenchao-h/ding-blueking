@@ -83,7 +83,7 @@ class SendDing(Component, SetupConfMixin):
                 "receiver__username": data["receiver__username"],
                 "title": data["title"],
                 "content": data["content"],
-                "msg_key": data.get("msg_key", "text"),
+                "msg_key": data.get("msg_key", "text") or "text",
             }
 
     def handle(self):
@@ -96,8 +96,8 @@ class SendDing(Component, SetupConfMixin):
             conf_dict = dict(json.loads(channel.comp_conf))
             token_field_in_db = conf_dict["token_field"]
             sign_field_in_db = conf_dict["sign_field"]
-            logger.info("token_field_in_db: ", token_field_in_db)
-            logger.info("sign_field_in_db: ", sign_field_in_db)
+            logger.info("token_field_in_db: %s"%token_field_in_db)
+            logger.info("sign_field_in_db: %s"%sign_field_in_db)
         except ESBChannel.DoesNotExist:
             logger.error("send_dingbot channel does not register.")
         except Exception as e:
@@ -105,8 +105,8 @@ class SendDing(Component, SetupConfMixin):
         token_field = token_field_in_db or getattr(configs, "token_field") or "qq"
         sign_field = sign_field_in_db or getattr(configs, "sign_field") or "wx_userid"
         dingbot_user, dingtalk_user = tools.group_by_user_type(self.form_data["receiver__username"], token_field, sign_field)
-        logger.info("dingbot_user: ", dingbot_user)
-        logger.info("dingtalk_user: ", dingtalk_user)
+        logger.info("dingbot_user: %s"%dingbot_user)
+        logger.info("dingtalk_user: %s"%dingtalk_user)
         channel_manager = get_channel_manager()
         if dingbot_user or  dingtalk_user:
             if dingbot_user:
@@ -148,8 +148,8 @@ class SendDing(Component, SetupConfMixin):
                     "message": "no dingtalk receiver."
                 }
         
-            logger.info("dingbot_result: ", dingbot_result)
-            logger.info("dingtalk_result:", dingtalk_result)
+            logger.info("dingbot_result: %s"%dingbot_result)
+            logger.info("dingtalk_result: %s"%dingtalk_result)
             if dingbot_result["result"] and dingtalk_result["result"]:
                 result = {
                     "result": True,
@@ -167,6 +167,6 @@ class SendDing(Component, SetupConfMixin):
                 "result": False,
                 "message": "no valid receiver."
             }
-        logger.info("send_ding result: ", result)
+        logger.info("send_ding result: %s"%result)
         self.response.payload = result
 

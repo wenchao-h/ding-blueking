@@ -48,6 +48,7 @@ class SendMessage(Component, SetupConfMixin):
                         "text": request_data.get("content")
                     }
                 })
+            logger.info("dingbot.SendMessage data: %s"%msg_data)
             ding_client = tools.DINGClient(self.outgoing.http_client)
             send_errors = []
             for bot in bots_info:

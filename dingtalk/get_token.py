@@ -39,7 +39,7 @@ class GetToken(Component, SetupConfMixin):
                 "appsecret": self.form_data["ding_app_secret"]
             })
 
-            logger.info("GetToken result: ", result)
+            logger.info("GetToken result: %s"%result)
             if result["result"]:
                 token_data = result["data"]
                 access_token = token_data["access_token"]

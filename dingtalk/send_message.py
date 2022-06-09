@@ -36,7 +36,7 @@ class SendMessage(Component, SetupConfMixin):
 
     def get_dingtalk_access_token(self, params):
         result = self.invoke_other("generic.dingtalk.get_token", kwargs=params)
-        logger.info("SendMessage dingtalk_token: ", result)
+        logger.info("SendMessage dingtalk_token: %s"%result)
         return  result["data"]["access_token"] if result["result"] else None
 
     def handle(self):
@@ -66,17 +66,19 @@ class SendMessage(Component, SetupConfMixin):
             }
             userid = []
             result={}
+            
             if self.form_data["receiver_type"] == "mobile":
                 mobile_data = {
                     "ding_app_key": self.form_data["ding_app_key"],
                     "ding_app_secret": self.form_data["ding_app_secret"],
                     "mobile": self.form_data["receiver"],
                 }
-                logger.info("dingtalk.sendmessage mobile_data: ", mobile_data)
+                logger.info("dingtalk.sendmessage mobile_data: %s"%mobile_data)
                 userid_result = self.invoke_other("generic.dingtalk.get_userid", kwargs=mobile_data)
                 if userid_result["result"]:
                     userid = userid_result["data"]["userid"]
                     data.update({"userid": userid})
+                    logger.info("dingtalk.send_message_by_userid data: %s"%data)
                     result = self.invoke_other("generic.dingtalk.send_message_by_userid", kwargs=data)
                     if result["result"] and userid_result.get("_extra_user_error_msg"):
                         result = {
@@ -86,61 +88,9 @@ class SendMessage(Component, SetupConfMixin):
                 else:
                     result = userid_result
             else:
+                logger.info("dingtalk.send_message_by_userid data: %s"%data)
                 result = self.invoke_other("generic.dingtalk.send_message_by_userid", kwargs=data)
             self.response.payload = result
 
 
 
-
-            #         if result["result"] and userid_result.get("_extra_user_error_msg"):
-            #             self.response.payload = {
-            #                 "result": False,
-            #                 "message": userid_result.get("_extra_user_error_msg")
-            #             }
-            #         else:
-            #             self.response.payload = result
-            #     else:
-            #         self.response.payload = userid_result
-            # else:
-                
-            
-
-
-
-
-
-        # data = {
-        #     "userid_list": "01350739106839900834",
-        #     "agent_id": self.form_data["agentid"],
-        #     "msg": {
-        #         "msgtype": "text",
-        #         "text": {
-        #             "content": self.form_data["content"]
-        #         }
-        #     }
-        # }
-
-        # ding_client = tools.DINGClient(self.outgoing.http_client)
-        # result = ding_client.post(
-        #     path="/topapi/message/corpconversation/asyncsend_v2?access_token=%s" % access_token,
-        #     data=json.dumps(data, ensure_ascii=False).encode("utf-8")
-        # )
-        # self.response.payload = result
-
-        # if result["result"]:
-        #     invaliduser = result.get("data", {}).get("invaliduser")
-        #     if invaliduser:
-        #         self.response.payload = {
-        #             "result": False,
-        #             "message": u"WeChat message sending failed, invalid user: %s" % invaliduser,
-        #         }
-        #     else:
-        #         self.response.payload = {"result": True, "message": u"WeChat message sending succeeded"}
-        # else:
-        #     ret_data = result.get("data", {})
-        #     message = "WeChat message sending failed"
-        #     if ret_data.get("invaliduser"):
-        #         message = u"%s, invalid user: %s" % (message, ret_data["invaliduser"])
-        #     if ret_data.get("errmsg"):
-        #         message = u"%s, %s" % (message, ret_data["errmsg"])
-        #     self.response.payload = {"result": False, "message": message, "data": result, "params": data}

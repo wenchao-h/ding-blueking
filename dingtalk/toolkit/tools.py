@@ -26,7 +26,7 @@ class DINGClient(object):
                 host_prod=host
             )
         result = self.http_client.request(method, host=real_host, path=path, params=params, data=data, headers=headers)
-        logger.info("DINGClient result: ", result)
+        logger.info("DINGClient result: %s"%result)
         try:
             err_code = result.get("errcode")
         except Exception:
