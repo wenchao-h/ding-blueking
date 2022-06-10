@@ -17,7 +17,7 @@ from common.forms import BaseComponentForm, ListField
 from common.constants import API_TYPE_OP
 from .toolkit import configs, tools
 from common.log import logger
-
+from common.errors import CommonAPIError
 
 class SendDingbot(Component, SetupConfMixin):
     """
@@ -37,8 +37,8 @@ class SendDingbot(Component, SetupConfMixin):
     | {{ _("字段") }}               |  {{ _("类型") }}      | {{ _("必选") }}   |  {{ _("描述") }}      |
     |--------------------|------------|--------|------------|
     | receiver__username |  string    | {{ _("是") }}     | {{ _("钉钉群助手名称，该名称需在蓝鲸平台注册，多个以逗号分隔") }} |
-    | msg_key            |  string    | {{ _("否") }}     | {{ _("消息格式，text 文本消息/markdown markdown消息，默认text") }}
-    | title              |  string    | {{ _("是") }}     | {{ _("消息标题") }} |
+    | msg_key            |  string    | {{ _("否") }}     | {{ _("消息格式text或者markdown，表示文本消息或者markdown消息，默认text") }}
+    | title              |  string    | {{ _("否") }}     | {{ _("消息标题，markdown消息必需要有消息标题，文本消息则不需要") }} |
     | content            |  string    | {{ _("是") }}     | {{ _("消息内容") }}|
 
 
@@ -50,7 +50,7 @@ class SendDingbot(Component, SetupConfMixin):
         "bk_app_secret": "xxx",
         "bk_username": "xxx",
         "receiver__username": "xxx,xxx",  # 机器人在用户管理注册的用户名
-        "msg_key": "xxx",  # sampleText文本消息/sampleMarkdown markdown消息
+        "msg_key": "xxx",  # text 文本消息/markdown markdown消息
         "title": "xx" # 标题
         "content": "xx" # 内容
     }
@@ -72,9 +72,9 @@ class SendDingbot(Component, SetupConfMixin):
 
     class Form(BaseComponentForm):
         receiver__username = ListField(label="dingbot receiver usernames", required=True)
-        title = forms.CharField(label="message title", required=True)
+        title = forms.CharField(label="message title", required=False)
         content = forms.CharField(label="message content", required=True)
-        msg_key = forms.CharField(label="msg key", required=True)
+        msg_key = forms.CharField(label="msg key", required=False)
 
         def clean(self):
             data = self.cleaned_data
@@ -82,11 +82,14 @@ class SendDingbot(Component, SetupConfMixin):
                 "receiver__username": data["receiver__username"],
                 "title": data["title"],
                 "content": data["content"],
-                "msg_key": data.get("msg_key", "text"),
+                "msg_key": data.get("msg_key", "text") or "text",
             }
 
 
     def handle(self):
+        # 当消息类型是markdown时，title参数是必需的
+        if self.form_data["msg_key"] == "markdown" and not self.form_data["title"]:
+            raise CommonAPIError("message title [title] This field is required when msg_key is markdown.")
         user_data = tools.get_token_sign_with_username(
             username_list=self.form_data["receiver__username"],
             token_field=(getattr(self, "token_field", "") or getattr(configs, "token_field", "extras__ddNumber")),

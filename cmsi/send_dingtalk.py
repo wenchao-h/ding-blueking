@@ -17,6 +17,7 @@ from common.forms import BaseComponentForm, ListField
 from common.constants import API_TYPE_OP
 from .toolkit import configs, tools
 from common.log import logger
+from common.errors import CommonAPIError
 
 
 class SendDingtalk(Component, SetupConfMixin):
@@ -39,8 +40,8 @@ class SendDingtalk(Component, SetupConfMixin):
     | userid             |  string    | {{ _("否") }}     | {{ _("钉钉接收者，钉钉用户的userid，多个以逗号分隔, 优先级比mobile、receiver_username高") }} |
     | mobile             |  string    | {{ _("否") }}     | {{ _("钉钉接收者手机号，多个以逗号分隔，优先级比receiver_username高") }} |
     | receiver__username |  string    | {{ _("否") }}     | {{ _("钉钉接收者，包含用户名，用户需在蓝鲸平台注册，多个以逗号分隔，优先级最低") }} |
-    | msg_key            |  string    | {{ _("否") }}     | {{ _("消息格式，sampleText文本消息/sampleMarkdown markdown消息，默认sampleText") }}
-    | title              |  string    | {{ _("是") }}     | {{ _("消息标题") }} |
+    | msg_key            |  string    | {{ _("否") }}     | {{ _("消息格式，text或者markdown，表示文本消息或者markdown消息，默认text") }}
+    | title              |  string    | {{ _("否") }}     | {{ _("消息标题，markdown消息必需要有消息标题，文本消息则不需要") }} |
     | content            |  string    | {{ _("是") }}     | {{ _("消息内容") }} |
     | ding_app_key       |  string    | {{ _("否") }}     | {{ _("钉钉内部机器人app key") }} |
     | ding_app_secret    |  string    | {{ _("否") }}     | {{ _("钉钉内部机器人app secret") }} |
@@ -80,8 +81,8 @@ class SendDingtalk(Component, SetupConfMixin):
         userid = ListField(label="dingtalk userid", required=False)
         mobile = ListField(label="dingtalk mobile", required=False)
         receiver__username = ListField(label="dingtalk receiver", required=False)
-        msg_key = forms.CharField(label="message key type", required=True)
-        title = forms.CharField(label="message title", required=True)
+        msg_key = forms.CharField(label="message key type", required=False)
+        title = forms.CharField(label="message title", required=False)
         content = forms.CharField(label="message content", required=True)
         ding_app_key = forms.CharField(label="app key", required=False)
         ding_app_secret = forms.CharField(label="app secret", required=False) 
@@ -115,7 +116,7 @@ class SendDingtalk(Component, SetupConfMixin):
                             return {
                                 "receiver_type": receiver_type,
                                 "receiver": receiver,
-                                "msg_key": data.get("msg_key", "sampleText"),
+                                "msg_key": data.get("msg_key", "text") or "text",
                                 "title": data["title"],
                                 "content": data["content"],
                                 "_extra_user_error_msg": user_data.get("_extra_user_error_msg")
@@ -131,6 +132,9 @@ class SendDingtalk(Component, SetupConfMixin):
 
 
     def handle(self):
+        # 当消息类型是markdown时，title参数是必需的
+        if self.form_data["msg_key"] == "markdown" and not self.form_data["title"]:
+            raise CommonAPIError("message title [title] This field is required when msg_key is markdown.")
         logger.info("dingtalk.appkey_in_db: %s"%getattr(self, "ding_app_key"))
         ding_app_key = (
             self.request.kwargs.get("ding_app_key")

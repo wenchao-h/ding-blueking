@@ -31,7 +31,7 @@ class SendMessage(Component, SetupConfMixin):
         receiver_type = forms.CharField(label="receiver type", required=True)
         receiver = ListField(label="receiver", required=True)
         msg_key = forms.CharField(label="msg key", required=True)
-        title = forms.CharField(label="message title", required=True)
+        title = forms.CharField(label="message title", required=False)
         content = forms.CharField(label="content", required=True)
 
     def get_dingtalk_access_token(self, params):
@@ -48,7 +48,7 @@ class SendMessage(Component, SetupConfMixin):
             }
         else:
             msg_param = ""
-            if self.form_data["msg_key"] == "sampleText":
+            if self.form_data["msg_key"] == "text":
                 msg_param = json.dumps({
                     "content": self.form_data["content"]
                 })

@@ -45,7 +45,7 @@ class SendMessageByUserid(Component, SetupConfMixin):
             data = {
                 "robotCode": self.form_data["ding_app_key"],
                 "userIds": self.form_data["userid"],
-                "msgKey": self.form_data["msg_key"],
+                "msgKey": "sampleText" if self.form_data.get("msg_key", "text") == "text" else "sampleMarkdown",
                 "msgParam": self.form_data["msg_param"],
             }
             client = tools.DINGClient(self.outgoing.http_client)

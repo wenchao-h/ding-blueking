@@ -18,6 +18,7 @@ from common.forms import BaseComponentForm, ListField
 from common.constants import API_TYPE_OP
 from .toolkit import configs, tools
 from common.log import logger
+from common.errors import CommonAPIError
 
 
 class SendDing(Component, SetupConfMixin):
@@ -38,8 +39,8 @@ class SendDing(Component, SetupConfMixin):
     | {{ _("字段") }}               |  {{ _("类型") }}      | {{ _("必选") }}   |  {{ _("描述") }}      |
     |--------------------|------------|--------|------------|
     | receiver__username |  string    | {{ _("是") }}     | {{ _("钉钉接收者，包含用户名，用户需在蓝鲸平台注册，多个以逗号分隔") }} |
-    | msg_key            |  string    | {{ _("否") }}     | {{ _("消息格式，text文本消息/markdown markdown消息，默认text") }}  |
-    | title              |  string    | {{ _("是") }}     | {{ _("消息标题") }} |
+    | msg_key            |  string    | {{ _("否") }}     | {{ _("消息格式text或者markdown，表示文本消息或者markdown消息，默认text") }}  |
+    | title              |  string    | {{ _("否") }}     | {{ _("消息标题，markdown消息必需要有消息标题，文本消息则不需要") }} |
     | content            |  string    | {{ _("是") }}     | {{ _("消息内容") }} |
 
 
@@ -74,7 +75,7 @@ class SendDing(Component, SetupConfMixin):
     class Form(BaseComponentForm):
         receiver__username = ListField(label="dingtalk receiver", required=True)
         msg_key = forms.CharField(label="message key type", required=False)
-        title = forms.CharField(label="message title", required=True)
+        title = forms.CharField(label="message title", required=False)
         content = forms.CharField(label="message content", required=True)
 
         def clean(self):
@@ -87,6 +88,10 @@ class SendDing(Component, SetupConfMixin):
             }
 
     def handle(self):
+        # 当消息类型是markdown时，title参数是必需的
+        if self.form_data["msg_key"] == "markdown" and not self.form_data["title"]:
+            raise CommonAPIError("message title [title] This field is required when msg_key is markdown.")
+
         dingbot_user = []
         dingtalk_user = []
         token_field_in_db = "qq"
@@ -131,7 +136,7 @@ class SendDing(Component, SetupConfMixin):
             if dingtalk_user:
                 dingtalk_data = {
                     "receiver__username": dingtalk_user,
-                    "msg_key": "sampleText" if self.form_data.get("msg_key", "text") == "text" else "sampleMarkdown",
+                    "msg_key": self.form_data["msg_key"],
                     "title": self.form_data["title"],
                     "content": self.form_data["content"]
                 }
