@@ -1,4 +1,33 @@
 # 钉钉通知接入和使用
+解压安装包到任意目录，把conf.py的内容复制到`bk-apigateway-bk-esb-confpy` configmap里，注意缩进
+```
+kubectl edit configmap bk-apigateway-bk-esb-confpy -n blueking
+```
+
+创建configmap，生成values,`${/path/to/xxx}`要替换为实际路径
+```
+./esb-custom-component-configmap-updater.sh -n blueking -x  -r  ${/path/to/dingbot}
+
+./esb-custom-component-configmap-updater.sh -n blueking -x  -r  ${/path/to/dingtalk}
+
+```
+```
+bk-esb:
+  customComponentConfigMaps:
+    - configmap: "esb.dingbot"
+      mountPath: "dingbot"
+    - configmap: "esb.dingbot.toolkit"
+      mountPath: "dingbot/toolkit"
+```
+
+```
+bk-esb:
+  customComponentConfigMaps:
+    - configmap: "esb.dingtalk"
+      mountPath: "dingtalk"
+    - configmap: "esb.dingtalk.toolkit"
+      mountPath: "dingtalk/toolkit"
+```
 
 钉钉通知渠道可以为**蓝鲸**增加钉钉消息通知方式，可以实现蓝鲸消息单发、消息群发功能
 
