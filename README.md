@@ -10,7 +10,9 @@ kubectl edit configmap bk-apigateway-bk-esb-confpy -n blueking
 
 ./esb-custom-component-configmap-updater.sh -n blueking -x  -r  ${/path/to/dingtalk}
 
+./esb-custom-component-configmap-updater.sh -n blueking -x  -r  ${/path/to/cmsi}
 ```
+预计会分别输出以下内容
 ```
 bk-esb:
   customComponentConfigMaps:
@@ -27,6 +29,71 @@ bk-esb:
       mountPath: "dingtalk"
     - configmap: "esb.dingtalk.toolkit"
       mountPath: "dingtalk/toolkit"
+```
+
+```
+bk-esb:
+  customComponentConfigMaps:
+    - configmap: "esb.cmsi"
+      mountPath: "cmsi"
+    - configmap: "esb.cmsi.apidoc"
+      mountPath: "cmsi/apidoc"
+    - configmap: "esb.cmsi.toolkit"
+      mountPath: "cmsi/toolkit"
+    - configmap: "esb.cmsi.toolkit.icons"
+      mountPath: "cmsi/toolkit/icons"
+    - configmap: "esb.cmsi.toolkit.icons-v2"
+      mountPath: "cmsi/toolkit/icons_v2"
+    - configmap: "esb.cmsi.apidocs"
+      mountPath: "cmsi/apidocs"
+    - configmap: "esb.cmsi.apidocs.en"
+      mountPath: "cmsi/apidocs/en"
+    - configmap: "esb.cmsi.apidocs.zh-hans"
+      mountPath: "cmsi/apidocs/zh_hans"
+```
+将上述输出内容，合并到bkapigateway-custom-values.yaml.gotmpl中，同时启用stakater-reloader，合并后的内容如下：
+```
+bkEsb:
+  customComponentConfigMaps:
+    - configmap: "esb.dingbot"
+      mountPath: "dingbot"
+    - configmap: "esb.dingbot.toolkit"
+      mountPath: "dingbot/toolkit"
+    - configmap: "esb.dingtalk"
+      mountPath: "dingtalk"
+    - configmap: "esb.dingtalk.toolkit"
+      mountPath: "dingtalk/toolkit"
+    - configmap: "esb.cmsi"
+      mountPath: "cmsi"
+    - configmap: "esb.cmsi.apidoc"
+      mountPath: "cmsi/apidoc"
+    - configmap: "esb.cmsi.toolkit"
+      mountPath: "cmsi/toolkit"
+    - configmap: "esb.cmsi.toolkit.icons"
+      mountPath: "cmsi/toolkit/icons"
+    - configmap: "esb.cmsi.toolkit.icons-v2"
+      mountPath: "cmsi/toolkit/icons_v2"
+    - configmap: "esb.cmsi.apidocs"
+      mountPath: "cmsi/apidocs"
+    - configmap: "esb.cmsi.apidocs.en"
+      mountPath: "cmsi/apidocs/en"
+    - configmap: "esb.cmsi.apidocs.zh-hans"
+      mountPath: "cmsi/apidocs/zh_hans"
+stakater:
+  enabled: true
+  reloader:
+    watchGlobally: false
+    deployment:
+      image:
+        ## 镜像名称，如需修改填写源
+        ##
+        name: stakater/reloader
+        tag: v0.0.102
+```
+
+重新部署apigateway
+```
+helmfile -f base-blueking.yaml.gotmpl -l name=bk-apigateway sync 
 ```
 
 钉钉通知渠道可以为**蓝鲸**增加钉钉消息通知方式，可以实现蓝鲸消息单发、消息群发功能
